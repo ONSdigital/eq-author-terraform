@@ -104,6 +104,10 @@ module "author-survey-runner" {
         "value": "${var.survey_runner_keys_file_name}"
       },
       {
+        "name": "EQ_SECRETS_FILE",
+        "value": "${var.survey_runner_secrets_file_name}"
+      },
+      {
         "name": "RESPONDENT_ACCOUNT_URL",
         "value": "${var.respondent_account_url}"
       },
