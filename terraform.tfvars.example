@@ -1,0 +1,10 @@
+env=""
+aws_account_id=""
+aws_assume_role_arn=""
+
+ons_access_ips=""
+certificate_arn=""
+slack_webhook_path=""
+
+author_firebase_project_id=""
+author_firebase_api_key=""
