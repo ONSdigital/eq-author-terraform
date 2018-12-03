@@ -140,16 +140,6 @@ variable "author_tag" {
   default     = "latest"
 }
 
-variable "author_api_tag" {
-  description = "The tag for the Author API image to run"
-  default     = "latest"
-}
-
-variable "publisher_tag" {
-  description = "The tag for the Publisher image to run"
-  default     = "latest"
-}
-
 variable "author_firebase_project_id" {
   description = "The Firebase authentication project id"
 }

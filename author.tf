@@ -238,7 +238,7 @@ module "author" {
   docker_registry                  = "${var.author_registry}"
   container_name                   = "eq-author"
   container_port                   = 3000
-  container_tag                    = "remove-some-vars"
+  container_tag                    = "${var.author_tag}"
   healthcheck_path                 = "/status.json"
   healthcheck_grace_period_seconds = 120
   slack_alert_sns_arn              = "${module.eq-alerting.slack_alert_sns_arn}"
@@ -283,7 +283,7 @@ module "author-api" {
   docker_registry        = "${var.author_registry}"
   container_name         = "eq-author-api"
   container_port         = 4000
-  container_tag          = "${var.author_api_tag}"
+  container_tag          = "${var.author_tag}"
   healthcheck_path       = "/status"
   application_min_tasks  = "${var.author_api_min_tasks}"
   slack_alert_sns_arn    = "${module.eq-alerting.slack_alert_sns_arn}"
@@ -322,7 +322,7 @@ module "publisher" {
   docker_registry        = "${var.author_registry}"
   container_name         = "eq-publisher"
   container_port         = 9000
-  container_tag          = "${var.publisher_tag}"
+  container_tag          = "${var.author_tag}"
   healthcheck_path       = "/status"
   application_min_tasks  = "${var.publisher_min_tasks}"
   slack_alert_sns_arn    = "${module.eq-alerting.slack_alert_sns_arn}"
