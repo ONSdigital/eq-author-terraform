@@ -57,7 +57,7 @@ variable "survey_runner_min_tasks" {
 
 variable "respondent_account_url" {
   description = "The url for the respondent log in"
-  default     = "https://survey.ons.gov.uk/"
+  default     = "https://surveys.ons.gov.uk/"
 }
 
 variable "survey_runner_log_level" {

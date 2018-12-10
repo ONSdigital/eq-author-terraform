@@ -202,31 +202,6 @@ module "author-survey-runner" {
   EOF
 }
 
-module "author-survey-runner-static" {
-  source                    = "github.com/ONSdigital/eq-ecs-deploy?ref=v3.0"
-  env                       = "${var.env}"
-  aws_account_id            = "${var.aws_account_id}"
-  aws_assume_role_arn       = "${var.aws_assume_role_arn}"
-  vpc_id                    = "${module.author-vpc.vpc_id}"
-  dns_zone_name             = "${var.dns_zone_name}"
-  dns_record_name           = "${var.env}-author-new-surveys.${var.dns_zone_name}"
-  ecs_cluster_name          = "${module.author-eq-ecs.ecs_cluster_name}"
-  aws_alb_arn               = "${module.author-eq-ecs.aws_alb_arn}"
-  aws_alb_listener_arn      = "${module.author-eq-ecs.aws_alb_listener_arn}"
-  service_name              = "author-surveys-static"
-  listener_rule_priority    = 5
-  docker_registry           = "${var.survey_runner_docker_registry}"
-  container_name            = "eq-survey-runner-static"
-  container_port            = 80
-  container_tag             = "${var.survey_runner_tag}"
-  application_min_tasks     = "${var.survey_runner_min_tasks}"
-  slack_alert_sns_arn       = "${module.eq-alerting.slack_alert_sns_arn}"
-  alb_listener_path_pattern = "/s/*"
-  ecs_subnet_ids            = "${module.author-eq-ecs.ecs_subnet_ids}"
-  ecs_alb_security_group    = ["${module.author-eq-ecs.ecs_alb_security_group}"]
-  launch_type               = "FARGATE"
-}
-
 module "author" {
   source                           = "github.com/ONSdigital/eq-ecs-deploy?ref=v3.0"
   env                              = "${var.env}"
@@ -251,6 +226,8 @@ module "author" {
   ecs_subnet_ids                   = "${module.author-eq-ecs.ecs_subnet_ids}"
   ecs_alb_security_group           = ["${module.author-eq-ecs.ecs_alb_security_group}"]
   launch_type                      = "FARGATE"
+  cpu_units                        = "256"
+  memory_units                     = "512"
 
   container_environment_variables = <<EOF
       {
@@ -297,8 +274,8 @@ module "author-api" {
 
   container_environment_variables = <<EOF
       {
-        "name": "DB_CONNECTION_URI",
-        "value": "postgres://${var.author_database_user}:${var.author_database_password}@${module.author-database.database_address}:${module.author-database.database_port}/${var.author_database_name}"
+        "name": "DB_SECRET_ID",
+        "value": "${module.author-database.secret_id}"
       },
       {
         "name": "RUNNER_SESSION_URL",
@@ -308,6 +285,24 @@ module "author-api" {
         "name": "PUBLISHER_URL",
         "value": "${module.publisher.service_address}/publish/"
       }
+  EOF
+
+  task_has_iam_policy = true
+  task_iam_policy_json = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+      {
+          "Sid": "",
+          "Effect": "Allow",
+          "Action": [
+              "secretsmanager:GetSecretValue"
+          ],
+          "Resource": "*"
+      }
+
+  ]
+}
   EOF
 }
 
@@ -368,10 +363,12 @@ module "author-schema-validator" {
   ecs_subnet_ids         = "${module.author-eq-ecs.ecs_subnet_ids}"
   ecs_alb_security_group = ["${module.author-eq-ecs.ecs_alb_security_group}"]
   launch_type            = "FARGATE"
+  cpu_units              = "512"
+  memory_units           = "1024"
 }
 
 module "author-database" {
-  source                           = "github.com/ONSdigital/eq-terraform/survey-runner-database"
+  source                           = "github.com/ONSdigital/eq-terraform?ref=create-secrets-manager-record/survey-runner-database"
   env                              = "${var.env}"
   aws_account_id                   = "${var.aws_account_id}"
   aws_assume_role_arn              = "${var.aws_assume_role_arn}"
@@ -393,7 +390,7 @@ module "author-database" {
 }
 
 module "author-survey-runner-dynamodb" {
-  source                                 = "github.com/ONSdigital/eq-terraform-dynamodb?ref=v2.0"
+  source                                 = "github.com/ONSdigital/eq-terraform-dynamodb?ref=v2.1"
   env                                    = "${var.env}-author"
   aws_account_id                         = "${var.aws_account_id}"
   aws_assume_role_arn                    = "${var.aws_assume_role_arn}"
