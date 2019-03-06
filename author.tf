@@ -39,7 +39,7 @@ module "eq-alerting" {
 }
 
 module "author-eq-ecs" {
-  source                  = "github.com/ONSdigital/eq-terraform-ecs?ref=v6.0"
+  source                  = "github.com/ONSdigital/eq-terraform-ecs?ref=v7.2"
   env                     = "${var.env}"
   ecs_cluster_name        = "eq-author"
   aws_account_id          = "${var.aws_account_id}"
@@ -53,18 +53,20 @@ module "author-eq-ecs" {
   ecs_cluster_max_size    = 0
   ons_access_ips          = ["${split(",", var.ons_access_ips)}"]
   gateway_ips             = ["${module.author-routing.nat_gateway_ips}"]
+  create_external_elb     = "${var.create_ecs_external_elb}"
+  create_internal_elb     = "${var.create_ecs_internal_elb}"
 }
 
 module "author-survey-runner" {
-  source                 = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.0"
+  source                 = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.1"
   env                    = "${var.env}"
   aws_account_id         = "${var.aws_account_id}"
   aws_assume_role_arn    = "${var.aws_assume_role_arn}"
   vpc_id                 = "${module.author-vpc.vpc_id}"
   dns_zone_name          = "${var.dns_zone_name}"
   ecs_cluster_name       = "${module.author-eq-ecs.ecs_cluster_name}"
-  aws_alb_arn            = "${module.author-eq-ecs.aws_alb_arn}"
-  aws_alb_listener_arn   = "${module.author-eq-ecs.aws_alb_listener_arn}"
+  aws_alb_arn            = "${module.author-eq-ecs.aws_external_alb_arn}"
+  aws_alb_listener_arn   = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
   service_name           = "author-surveys"
   listener_rule_priority = 200
   docker_registry        = "${var.survey_runner_docker_registry}"
@@ -203,7 +205,7 @@ module "author-survey-runner" {
 }
 
 module "author-survey-runner-static" {
-  source                     = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.0"
+  source                     = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.1"
   env                        = "${var.env}"
   aws_account_id             = "${var.aws_account_id}"
   aws_assume_role_arn        = "${var.aws_assume_role_arn}"
@@ -211,8 +213,8 @@ module "author-survey-runner-static" {
   dns_zone_name              = "${var.dns_zone_name}"
   dns_record_name            = "${var.env}-author-new-surveys.${var.dns_zone_name}"
   ecs_cluster_name           = "${module.author-eq-ecs.ecs_cluster_name}"
-  aws_alb_arn                = "${module.author-eq-ecs.aws_alb_arn}"
-  aws_alb_listener_arn       = "${module.author-eq-ecs.aws_alb_listener_arn}"
+  aws_alb_arn                = "${module.author-eq-ecs.aws_external_alb_arn}"
+  aws_alb_listener_arn       = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
   service_name               = "author-surveys-static"
   listener_rule_priority     = 100
   docker_registry            = "${var.survey_runner_docker_registry}"
@@ -230,15 +232,15 @@ module "author-survey-runner-static" {
 }
 
 module "author" {
-  source                           = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.0"
+  source                           = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.1"
   env                              = "${var.env}"
   aws_account_id                   = "${var.aws_account_id}"
   aws_assume_role_arn              = "${var.aws_assume_role_arn}"
   dns_zone_name                    = "${var.dns_zone_name}"
   ecs_cluster_name                 = "${module.author-eq-ecs.ecs_cluster_name}"
   vpc_id                           = "${module.author-vpc.vpc_id}"
-  aws_alb_arn                      = "${module.author-eq-ecs.aws_alb_arn}"
-  aws_alb_listener_arn             = "${module.author-eq-ecs.aws_alb_listener_arn}"
+  aws_alb_arn                      = "${module.author-eq-ecs.aws_external_alb_arn}"
+  aws_alb_listener_arn             = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
   service_name                     = "author"
   listener_rule_priority           = 400
   docker_registry                  = "${var.author_registry}"
@@ -282,7 +284,7 @@ module "author" {
 }
 
 module "author-api" {
-  source                     = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.0"
+  source                     = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.1"
   env                        = "${var.env}"
   aws_account_id             = "${var.aws_account_id}"
   aws_assume_role_arn        = "${var.aws_assume_role_arn}"
@@ -290,8 +292,8 @@ module "author-api" {
   dns_record_name            = "${var.env}-author.${var.dns_zone_name}"
   ecs_cluster_name           = "${module.author-eq-ecs.ecs_cluster_name}"
   vpc_id                     = "${module.author-vpc.vpc_id}"
-  aws_alb_arn                = "${module.author-eq-ecs.aws_alb_arn}"
-  aws_alb_listener_arn       = "${module.author-eq-ecs.aws_alb_listener_arn}"
+  aws_alb_arn                = "${module.author-eq-ecs.aws_external_alb_arn}"
+  aws_alb_listener_arn       = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
   service_name               = "author-api"
   listener_rule_priority     = 300
   docker_registry            = "${var.author_registry}"
@@ -324,15 +326,15 @@ module "author-api" {
 }
 
 module "publisher" {
-  source                 = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.0"
+  source                 = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.1"
   env                    = "${var.env}"
   aws_account_id         = "${var.aws_account_id}"
   aws_assume_role_arn    = "${var.aws_assume_role_arn}"
   dns_zone_name          = "${var.dns_zone_name}"
   ecs_cluster_name       = "${module.author-eq-ecs.ecs_cluster_name}"
   vpc_id                 = "${module.author-vpc.vpc_id}"
-  aws_alb_arn            = "${module.author-eq-ecs.aws_alb_arn}"
-  aws_alb_listener_arn   = "${module.author-eq-ecs.aws_alb_listener_arn}"
+  aws_alb_arn            = "${module.author-eq-ecs.aws_external_alb_arn}"
+  aws_alb_listener_arn   = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
   service_name           = "publisher"
   listener_rule_priority = 500
   docker_registry        = "${var.author_registry}"
@@ -359,15 +361,15 @@ module "publisher" {
 }
 
 module "author-schema-validator" {
-  source                 = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.0"
+  source                 = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.1"
   env                    = "${var.env}"
   aws_account_id         = "${var.aws_account_id}"
   aws_assume_role_arn    = "${var.aws_assume_role_arn}"
   vpc_id                 = "${module.author-vpc.vpc_id}"
   dns_zone_name          = "${var.dns_zone_name}"
   ecs_cluster_name       = "${module.author-eq-ecs.ecs_cluster_name}"
-  aws_alb_arn            = "${module.author-eq-ecs.aws_alb_arn}"
-  aws_alb_listener_arn   = "${module.author-eq-ecs.aws_alb_listener_arn}"
+  aws_alb_arn            = "${module.author-eq-ecs.aws_external_alb_arn}"
+  aws_alb_listener_arn   = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
   service_name           = "author-schema-validator"
   listener_rule_priority = 600
   docker_registry        = "${var.schema_validator_registry}"
@@ -407,11 +409,11 @@ module "author-database" {
 }
 
 module "author-survey-runner-dynamodb" {
-  source                                 = "github.com/ONSdigital/eq-terraform-dynamodb?ref=v2.2"
-  env                                    = "${var.env}-author"
-  aws_account_id                         = "${var.aws_account_id}"
-  aws_assume_role_arn                    = "${var.aws_assume_role_arn}"
-  slack_alert_sns_arn                    = "${module.eq-alerting.slack_alert_sns_arn}"
+  source              = "github.com/ONSdigital/eq-terraform-dynamodb?ref=v2.2"
+  env                 = "${var.env}-author"
+  aws_account_id      = "${var.aws_account_id}"
+  aws_assume_role_arn = "${var.aws_assume_role_arn}"
+  slack_alert_sns_arn = "${module.eq-alerting.slack_alert_sns_arn}"
 }
 
 output "author_service_address" {
