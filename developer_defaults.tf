@@ -183,3 +183,14 @@ variable "schema_validator_min_tasks" {
   description = "The minimum number of Schema Validator tasks to run"
   default     = "1"
 }
+
+// ECS
+variable "create_ecs_external_elb" {
+  description = "Deploy an external load balancer for ECS"
+  default     = true
+}
+
+variable "create_ecs_internal_elb" {
+  description = "Deploy an internal load balancer for ECS"
+  default     = false
+}
