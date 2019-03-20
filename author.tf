@@ -321,7 +321,49 @@ module "author-api" {
       {
         "name": "PUBLISHER_URL",
         "value": "${module.publisher.service_address}/publish/"
+      },
+      {
+        "name": "DYNAMO_QUESTIONNAIRE_TABLE_NAME",
+        "value": "${module.author-dynamodb.author_questionnaires_table_name}"
+      },
+      {
+        "name": "DYNAMO_QUESTIONNAIRE_VERSION_TABLE_NAME",
+        "value": "${module.author-dynamodb.author_questionnaire_versions_table_name}"
       }
+  EOF
+
+  task_has_iam_policy = true
+
+  task_iam_policy_json = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+      {
+          "Sid": "",
+          "Effect": "Allow",
+          "Action": [
+              "dynamodb:Scan",
+              "dynamodb:DescribeTable",
+              "dynamodb:PutItem",
+              "dynamodb:UpdateItem",
+              "dynamodb:GetItem",
+              "dynamodb:DeleteItem"
+          ],
+          "Resource": "${module.author-dynamodb.author_questionnaires_table_arn}"
+      },
+      {
+          "Sid": "",
+          "Effect": "Allow",
+          "Action": [
+              "dynamodb:DescribeTable",
+              "dynamodb:PutItem",
+              "dynamodb:GetItem",
+              "dynamodb:Query"
+          ],
+          "Resource": "${module.author-dynamodb.author_questionnaire_versions_table_arn}"
+      }
+  ]
+}
   EOF
 }
 
@@ -410,6 +452,14 @@ module "author-database" {
 
 module "author-survey-runner-dynamodb" {
   source              = "github.com/ONSdigital/eq-terraform-dynamodb?ref=v2.2"
+  env                 = "${var.env}-author"
+  aws_account_id      = "${var.aws_account_id}"
+  aws_assume_role_arn = "${var.aws_assume_role_arn}"
+  slack_alert_sns_arn = "${module.eq-alerting.slack_alert_sns_arn}"
+}
+
+module "author-dynamodb" {
+  source              = "github.com/ONSdigital/eq-author-terraform-dynamodb?ref=v0.1"
   env                 = "${var.env}-author"
   aws_account_id      = "${var.aws_account_id}"
   aws_assume_role_arn = "${var.aws_assume_role_arn}"
