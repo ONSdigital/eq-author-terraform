@@ -279,6 +279,14 @@ module "author" {
       {
         "name": "REACT_APP_FIREBASE_API_KEY",
         "value": "${var.author_firebase_api_key}"
+      },
+      {
+        "name": "REACT_APP_GTM_ID",
+        "value": "${var.author_gtm_id}"
+      },
+      {
+        "name": "REACT_APP_GTM_ENV_ID",
+        "value": "${var.author_gtm_env_id}"
       }
   EOF
 }

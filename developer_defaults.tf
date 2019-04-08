@@ -153,6 +153,16 @@ variable "author_firebase_api_key" {
   description = "The Firebase authentication API key"
 }
 
+variable "author_gtm_id" {
+  description = "The Google Tag Manager container ID"
+  default     = ""
+}
+
+variable "author_gtm_env_id" {
+  description = "The Google Tag Manager environment ID"
+  default     = ""
+}
+
 variable "author_min_tasks" {
   description = "The minimum number of Author tasks to run"
   default     = "1"
