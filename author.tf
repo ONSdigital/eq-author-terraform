@@ -337,6 +337,10 @@ module "author-api" {
       {
         "name": "DYNAMO_QUESTIONNAIRE_VERSION_TABLE_NAME",
         "value": "${module.author-dynamodb.author_questionnaire_versions_table_name}"
+      },
+      {
+        "name": "ENABLE_IMPORT",
+        "value": "${var.author_api_enable_import}"
       }
   EOF
 
