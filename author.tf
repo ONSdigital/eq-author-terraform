@@ -341,6 +341,9 @@ module "author-api" {
       {
         "name": "ENABLE_IMPORT",
         "value": "${var.author_api_enable_import}"
+      },
+        "name": "DYNAMO_USER_TABLE_NAME",
+        "value": "${module.author-dynamodb.author_users_table_name}"
       }
   EOF
 
@@ -373,6 +376,18 @@ module "author-api" {
               "dynamodb:Query"
           ],
           "Resource": "${module.author-dynamodb.author_questionnaire_versions_table_arn}"
+      },
+      {
+          "Sid": "",
+          "Effect": "Allow",
+          "Action": [
+              "dynamodb:Scan",
+              "dynamodb:DescribeTable",
+              "dynamodb:PutItem",
+              "dynamodb:UpdateItem",
+              "dynamodb:GetItem"
+          ],
+          "Resource": "${module.author-dynamodb.author_users_table_arn}"
       }
   ]
 }
