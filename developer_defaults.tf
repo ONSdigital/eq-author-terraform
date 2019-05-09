@@ -163,6 +163,11 @@ variable "author_gtm_env_id" {
   default     = ""
 }
 
+variable "author_api_enable_import" {
+  description = "Whether to enable the import endpoint on the api"
+  default     = "false"
+}
+
 variable "author_min_tasks" {
   description = "The minimum number of Author tasks to run"
   default     = "1"
