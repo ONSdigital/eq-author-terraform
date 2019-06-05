@@ -341,6 +341,14 @@ module "author-api" {
       {
         "name": "ENABLE_IMPORT",
         "value": "${var.author_api_enable_import}"
+      },
+      {
+        "name": "REDIS_DOMAIN_NAME",
+        "value": "${aws_elasticache_cluster.memory-store.cache_nodes.0.address}"
+      },
+      {
+        "name": "REDIS_PORT",
+        "value": "${aws_elasticache_cluster.memory-store.cache_nodes.0.port}"
       }
   EOF
 
@@ -477,6 +485,42 @@ module "author-dynamodb" {
   aws_assume_role_arn = "${var.aws_assume_role_arn}"
   slack_alert_sns_arn = "${module.eq-alerting.slack_alert_sns_arn}"
 }
+
+resource "aws_elasticache_cluster" "memory-store" {
+  cluster_id                   = "${var.env}-redis"
+  engine                       = "redis"
+  node_type                    = "cache.t2.small"
+  num_cache_nodes              = 1
+  parameter_group_name         = "default.redis5.0"
+  engine_version               = "5.0.3"
+  subnet_group_name            = "${aws_elasticache_subnet_group.memory-store.name}"
+  security_group_ids           = ["${aws_security_group.memory-store-access.id}"]
+  availability_zone            = "eu-west-1a"
+  port                         = 6379
+}
+
+resource "aws_elasticache_subnet_group" "memory-store" {
+  name       = "${var.env}-memory-store-subnet-group"
+  subnet_ids = ["${module.author-vpc.database_subnet_ids}"]
+}
+
+resource "aws_security_group" "memory-store-access" {
+  name        = "${var.env}-memory-store-access"
+  description = "Redis access from the application subnet"
+  vpc_id      = "${module.author-vpc.vpc_id}"
+
+  ingress {
+    from_port   = 6379
+    to_port     = 6379
+    protocol    = "tcp"
+    cidr_blocks = "${var.author_application_cidrs}"
+  }
+
+  tags {
+    Name = "${var.env}-memory-store-security-group"
+  }
+}
+
 
 output "author_service_address" {
   value = "${module.author.service_address}"
