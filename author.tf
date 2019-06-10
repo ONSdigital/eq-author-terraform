@@ -342,6 +342,7 @@ module "author-api" {
         "name": "ENABLE_IMPORT",
         "value": "${var.author_api_enable_import}"
       },
+      {
         "name": "DYNAMO_USER_TABLE_NAME",
         "value": "${module.author-dynamodb.author_users_table_name}"
       }
