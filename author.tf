@@ -289,8 +289,8 @@ module "author" {
         "value": "${var.author_gtm_env_id}"
       },
       {
-        "name": "REACT_APP_SENTRY_ID",
-        "value": "${var.author_sentry_id}"
+        "name": "REACT_APP_SENTRY_DSN",
+        "value": "${var.author_sentry_dsn}"
       }
   EOF
 }

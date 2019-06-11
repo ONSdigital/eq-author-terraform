@@ -163,8 +163,8 @@ variable "author_gtm_env_id" {
   default     = ""
 }
 
-variable "author_sentry_id" {
-  description = "The Sentry Project ID"
+variable "author_sentry_dsn" {
+  description = "The Sentry Project dsn"
   default     = ""
 }
 
