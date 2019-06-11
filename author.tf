@@ -386,7 +386,8 @@ module "author-api" {
               "dynamodb:DescribeTable",
               "dynamodb:PutItem",
               "dynamodb:UpdateItem",
-              "dynamodb:GetItem"
+              "dynamodb:GetItem",
+              "dynamodb:Query"
           ],
           "Resource": "${module.author-dynamodb.author_users_table_arn}"
       }
