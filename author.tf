@@ -314,7 +314,7 @@ module "author-api" {
   ecs_subnet_ids             = "${module.author-eq-ecs.ecs_subnet_ids}"
   ecs_alb_security_group     = ["${module.author-eq-ecs.ecs_alb_security_group}"]
   launch_type                = "FARGATE"
-  alb_listener_path_patterns = ["/graphql*", "/launch*", "/status", "/export*", "/import*"]
+  alb_listener_path_patterns = ["/graphql*", "/launch*", "/status", "/export*", "/import*", "/signIn"]
   auth_unauth_action         = "deny"
 
   container_environment_variables = <<EOF
