@@ -241,8 +241,9 @@ module "author" {
   vpc_id                           = "${module.author-vpc.vpc_id}"
   aws_alb_arn                      = "${module.author-eq-ecs.aws_external_alb_arn}"
   aws_alb_listener_arn             = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
+  aws_alb_use_host_header          = false
   service_name                     = "author"
-  listener_rule_priority           = 400
+  listener_rule_priority           = 900
   docker_registry                  = "${var.author_registry}"
   container_name                   = "eq-author"
   container_port                   = 3000
@@ -306,6 +307,7 @@ module "author-api" {
   vpc_id                     = "${module.author-vpc.vpc_id}"
   aws_alb_arn                = "${module.author-eq-ecs.aws_external_alb_arn}"
   aws_alb_listener_arn       = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
+  aws_alb_use_host_header    = false
   service_name               = "author-api"
   listener_rule_priority     = 300
   docker_registry            = "${var.author_registry}"
@@ -501,4 +503,20 @@ module "author-dynamodb" {
 
 output "author_service_address" {
   value = "${module.author.service_address}"
+}
+
+resource "aws_lb_listener" "redirect_http_to_https" {
+  load_balancer_arn = "${module.author-eq-ecs.aws_external_alb_arn}"
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
 }
