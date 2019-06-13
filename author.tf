@@ -359,7 +359,7 @@ module "author-api" {
       {
         "name": "GOOGLE_APPLICATION_CREDENTIALS",
         "value": "${var.author_firebase_service_account_key}"
-      },
+      }
 
   EOF
 

@@ -8,3 +8,4 @@ slack_webhook_path=""
 
 author_firebase_project_id=""
 author_firebase_api_key=""
+author_firebase_service_account_key=""
