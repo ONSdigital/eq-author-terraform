@@ -351,7 +351,16 @@ module "author-api" {
       {
         "name": "DYNAMO_USER_TABLE_NAME",
         "value": "${module.author-dynamodb.author_users_table_name}"
-      }
+      },
+      {
+        "name": "SECRETS_S3_BUCKET",
+        "value": "${var.author_secrets_bucket_name}"
+      },
+      {
+        "name": "GOOGLE_APPLICATION_CREDENTIALS",
+        "value": "${var.author_firebase_service_account_key}"
+      },
+
   EOF
 
   task_has_iam_policy = true

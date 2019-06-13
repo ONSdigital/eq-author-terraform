@@ -153,6 +153,14 @@ variable "author_firebase_api_key" {
   description = "The Firebase authentication API key"
 }
 
+variable "author_firebase_service_account_key" {
+  description = "A path to the service account JSON key file"
+}
+
+variable "author_secrets_bucket_name" {
+  description = "Name of S3 bucket where Author secrets are stored"
+}
+
 variable "author_gtm_id" {
   description = "The Google Tag Manager container ID"
   default     = ""
