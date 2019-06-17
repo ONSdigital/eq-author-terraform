@@ -36,12 +36,13 @@ author_firebase_api_key=""
 # A service account is required to verify Firebase tokens in Author's API.
 # A key file can be generated for the service account by following the instructions at https://firebase.google.com/docs/admin/setup#initialize_the_sdk
 # The following variable needs to be set to the absolute path of the JSON key file within the container.
-# If syncing from S3 (see below) this will be something like '/secrets/path-to-key-file.json'
+# Assuming the key is synced from an S3 bucket (see below), this will be something like '/secrets/path-to-key-file.json'
 author_firebase_service_account_key=""
 
 # The key file can be synced from an S3 bucket by setting the following variable.
 # If set, the contents of this bucket will be synced to the /secrets directory within the container.
-author_secrets_bucket_name=""
+
+# author_secrets_bucket_name=""
 
 # See also https://github.com/ONSdigital/eq-author-app/blob/master/docs/AUTHENTICATION.md
 
