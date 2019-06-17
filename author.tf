@@ -377,7 +377,7 @@ module "author-api" {
               "s3:ListBucket",
               "s3:GetObject"
           ],
-          "Resource": "arn:aws:s3:::*"
+          "Resource": "arn:aws:s3:::${var.author_secrets_bucket_name}"
       },
       {
           "Sid": "",
