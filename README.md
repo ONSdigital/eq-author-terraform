@@ -32,6 +32,18 @@ slack_webhook_path=""
 # Create your own credentials here https://firebase.google.com/
 author_firebase_project_id=""
 author_firebase_api_key=""
+
+# A service account is required to verify Firebase tokens in Author's API.
+# A key file can be generated for the service account by following the instructions at https://firebase.google.com/docs/admin/setup#initialize_the_sdk
+# The following variable needs to be set and should be a path to the JSON key file.
+author_firebase_service_account_key=""
+
+#The key file can be synced from an S3 bucket by setting the following variable
+author_secrets_bucket_name=""
+
+# See also https://github.com/ONSdigital/eq-author-app/blob/master/docs/AUTHENTICATION.md
+
+
 ```
 
 1. Run `aws configure`. Add your AWS access key and secret key when prompted for S3. Use "eu-west-1" as your region name. Leave any other values as default.
