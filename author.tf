@@ -504,19 +504,3 @@ module "author-dynamodb" {
 output "author_service_address" {
   value = "${module.author.service_address}"
 }
-
-resource "aws_lb_listener" "redirect_http_to_https" {
-  load_balancer_arn = "${module.author-eq-ecs.aws_external_alb_arn}"
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-}
