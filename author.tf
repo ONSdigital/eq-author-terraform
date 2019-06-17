@@ -287,6 +287,10 @@ module "author" {
       {
         "name": "REACT_APP_GTM_ENV_ID",
         "value": "${var.author_gtm_env_id}"
+      },
+      {
+        "name": "REACT_APP_SENTRY_DSN",
+        "value": "${var.author_sentry_dsn}"
       }
   EOF
 }

@@ -163,6 +163,11 @@ variable "author_gtm_env_id" {
   default     = ""
 }
 
+variable "author_sentry_dsn" {
+  description = "The Sentry Project dsn"
+  default     = ""
+}
+
 variable "author_api_enable_import" {
   description = "Whether to enable the import endpoint on the api"
   default     = "false"
