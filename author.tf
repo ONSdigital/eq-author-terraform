@@ -351,6 +351,10 @@ module "author-api" {
       {
         "name": "DYNAMO_USER_TABLE_NAME",
         "value": "${module.author-dynamodb.author_users_table_name}"
+      },
+      {
+        "name": "FIREBASE_PROJECT_ID",
+        "value": "${var.author_firebase_project_id}"
       }
   EOF
 
