@@ -358,11 +358,11 @@ module "author-api" {
       },
       {
         "name": "REDIS_DOMAIN_NAME",
-        "value": "${aws_elasticache_cluster.author-redis.cache_nodes.0.address}"
+        "value": "${module.author-redis.author_redis_address}"
       },
       {
         "name": "REDIS_PORT",
-        "value": "${aws_elasticache_cluster.author-redis.cache_nodes.0.port}"
+        "value": "${module.author-redis.author_redis_port}"
       }
   EOF
 
@@ -513,39 +513,14 @@ module "author-dynamodb" {
   slack_alert_sns_arn = "${module.eq-alerting.slack_alert_sns_arn}"
 }
 
-resource "aws_elasticache_cluster" "author-redis" {
-  cluster_id                   = "${var.env}-author-redis"
-  engine                       = "redis"
-  node_type                    = "cache.t2.micro"
-  num_cache_nodes              = 1
-  parameter_group_name         = "default.redis5.0"
-  engine_version               = "5.0.4"
-  subnet_group_name            = "${aws_elasticache_subnet_group.author-redis-subnet-group.name}"
-  security_group_ids           = ["${aws_security_group.author-redis-access.id}"]
-  availability_zone            = "eu-west-1a"
-  port                         = 6379
-}
-
-resource "aws_elasticache_subnet_group" "author-redis-subnet-group" {
-  name       = "${var.env}-author-redis-subnet-group"
-  subnet_ids = ["${module.author-vpc.database_subnet_ids}"]
-}
-
-resource "aws_security_group" "author-redis-access" {
-  name        = "${var.env}-author-redis-access"
-  description = "Redis access from the application subnet"
-  vpc_id      = "${module.author-vpc.vpc_id}"
-
-  ingress {
-    from_port   = 6379
-    to_port     = 6379
-    protocol    = "tcp"
-    cidr_blocks = "${var.author_application_cidrs}"
-  }
-
-  tags {
-    Name = "${var.env}-author-redis-security-group"
-  }
+module "author-redis" {
+  source              = "github.com/ONSdigital/eq-author-terraform-redis?ref=v1.0"
+  env                 = "${var.env}-author"
+  aws_account_id      = "${var.aws_account_id}"
+  aws_assume_role_arn = "${var.aws_assume_role_arn}"
+  vpc_id              = "${module.author-vpc.vpc_id}"
+  application_cidrs   = "${var.author_application_cidrs}"
+  database_subnet_ids = "${module.author-vpc.database_subnet_ids}"
 }
 
 
