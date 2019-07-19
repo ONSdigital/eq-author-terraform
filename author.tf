@@ -527,3 +527,51 @@ module "author-redis" {
 output "author_service_address" {
   value = "${module.author.service_address}"
 }
+
+resource "aws_wafregional_web_acl" "author_web_acl" {
+  metric_name = "${var.env}AuthorWebAcl"
+  name = "${var.env}-author-web-acl"
+
+  default_action {
+    type = "BLOCK"
+  }
+
+  rule {
+    action {
+      type = "ALLOW"
+    }
+
+    priority = 1
+    rule_id = "${aws_wafregional_rule.allow_uk_traffic.id}"
+    type = "REGULAR"
+
+  }
+}
+
+resource "aws_wafregional_rule" "allow_uk_traffic" {
+
+  metric_name = "${var.env}AuthorAllowUkTraffic"
+  name = "${var.env}-author-allow-uk-traffic"
+
+  predicate {
+    data_id = "${aws_wafregional_geo_match_set.uk_geo_match_set.id}"
+    negated = false
+    type = "GeoMatch"
+  }
+
+}
+
+resource "aws_wafregional_geo_match_set" "uk_geo_match_set" {
+  name = "${var.env}-uk-geo"
+
+  geo_match_constraint {
+    type = "Country"
+    value = "GB"
+  }
+}
+
+resource "aws_wafregional_web_acl_association" "web_acl_lb_association" {
+  depends_on = ["aws_wafregional_web_acl.author_web_acl", "module.author-eq-ecs"]
+  resource_arn = "${module.author-eq-ecs.aws_external_alb_arn}"
+  web_acl_id   = "${aws_wafregional_web_acl.author_web_acl.id}"
+}
