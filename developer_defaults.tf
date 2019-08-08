@@ -158,8 +158,13 @@ variable "author_gtm_id" {
   default     = ""
 }
 
-variable "author_gtm_env_id" {
+variable "author_gtm_auth" {
   description = "The Google Tag Manager environment ID"
+  default     = ""
+}
+
+variable "author_gtm_preview" {
+  description = "The Google Tag Manager preview environment"
   default     = ""
 }
 

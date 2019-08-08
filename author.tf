@@ -286,8 +286,12 @@ module "author" {
         "value": "${var.author_gtm_id}"
       },
       {
-        "name": "REACT_APP_GTM_ENV_ID",
-        "value": "${var.author_gtm_env_id}"
+        "name": "REACT_APP_GTM_AUTH",
+        "value": "${var.author_gtm_auth}"
+      },
+      {
+        "name": "REACT_APP_GTM_PREVIEW",
+        "value": "${var.author_gtm_preview}"
       },
       {
         "name": "REACT_APP_SENTRY_DSN",
