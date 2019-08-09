@@ -193,6 +193,36 @@ variable "publisher_min_tasks" {
   default     = "1"
 }
 
+variable "survey_launcher_tag" {
+  description = "The tag for the Survey Launcher image to run"
+  default     = "latest"
+}
+
+variable "survey_launcher_jwt_encryption_key_path" {
+  description = "Path to the JWT Encryption Key (PEM format)"
+  default     = "jwt-test-keys/sdc-user-authentication-encryption-sr-public-key.pem"
+}
+
+variable "survey_launcher_jwt_signing_key_path" {
+  description = "Path to the JWT Signing Key (PEM format)"
+  default     = "jwt-test-keys/sdc-user-authentication-signing-launcher-private-key.pem"
+}
+
+variable "survey_register_min_tasks" {
+  description = "The minimum number of Survey Register tasks to run"
+  default     = "1"
+}
+
+variable "survey_launcher_min_tasks" {
+  description = "The minimum number of Survey Launcher tasks to run"
+  default     = "1"
+}
+
+variable "survey_launcher_s3_secrets_bucket" {
+  description = "The S3 bucket that contains the secrets"
+  default     = ""
+}
+
 // Schema Validator
 variable "schema_validator_registry" {
   description = "The docker repository for the Schema Validator image to run"
