@@ -231,6 +231,53 @@ module "author-survey-runner-static" {
   memory_units               = "512"
 }
 
+module "author-survey-launcher" {
+  source                   = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.1"
+  env                      = "${var.env}"
+  aws_account_id           = "${var.aws_account_id}"
+  aws_assume_role_arn      = "${var.aws_assume_role_arn}"
+  vpc_id                   = "${module.author-vpc.vpc_id}"
+  dns_zone_name            = "${var.dns_zone_name}"
+  ecs_cluster_name         = "${module.author-eq-ecs.ecs_cluster_name}"
+  aws_alb_arn              = "${module.author-eq-ecs.aws_external_alb_arn}"
+  aws_alb_listener_arn     = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
+  service_name             = "author-launch"
+  listener_rule_priority   = 700
+  docker_registry          = "${var.author_registry}"
+  container_name           = "go-launch-a-survey"
+  container_port           = 8000
+  healthcheck_path         = "/status"
+  container_tag            = "${var.survey_launcher_tag}"
+  application_min_tasks    = "${var.survey_launcher_min_tasks}"
+  ecs_subnet_ids           = "${module.author-eq-ecs.ecs_subnet_ids}"
+  ecs_alb_security_group   = ["${module.author-eq-ecs.ecs_alb_security_group}"]
+  launch_type              = "FARGATE"
+  slack_alert_sns_arn      = "${module.eq-alerting.slack_alert_sns_arn}"
+
+  container_environment_variables = <<EOF
+      {
+        "name": "SURVEY_RUNNER_URL",
+        "value": "${module.author-survey-runner.service_address}"
+      },
+      {
+        "name": "SCHEMA_VALIDATOR_URL",
+        "value": "${module.author-schema-validator.service_address}"
+      },
+      {
+        "name": "JWT_ENCRYPTION_KEY_PATH",
+        "value": "${var.survey_launcher_jwt_encryption_key_path}"
+      },
+      {
+        "name": "JWT_SIGNING_KEY_PATH",
+        "value": "${var.survey_launcher_jwt_signing_key_path}"
+      },
+      {
+        "name": "SECRETS_S3_BUCKET",
+        "value": "${var.survey_launcher_s3_secrets_bucket}"
+      }
+  EOF
+}
+
 module "author" {
   source                           = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.1"
   env                              = "${var.env}"
@@ -313,7 +360,7 @@ module "author-api" {
   aws_alb_listener_arn       = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
   aws_alb_use_host_header    = false
   service_name               = "author-api"
-  listener_rule_priority     = 300
+  listener_rule_priority     = 800
   docker_registry            = "${var.author_registry}"
   container_name             = "eq-author-api"
   container_port             = 4000
@@ -339,6 +386,10 @@ module "author-api" {
       {
         "name": "PUBLISHER_URL",
         "value": "${module.publisher.service_address}/publish/"
+      },
+      {
+        "name": "SURVEY_REGISTER_URL",
+        "value": "${module.survey-register.service_address}/submit/"
       },
       {
         "name": "DYNAMO_QUESTIONNAIRE_TABLE_NAME",
@@ -429,7 +480,7 @@ module "publisher" {
   aws_alb_arn            = "${module.author-eq-ecs.aws_external_alb_arn}"
   aws_alb_listener_arn   = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
   service_name           = "publisher"
-  listener_rule_priority = 500
+  listener_rule_priority = 300
   docker_registry        = "${var.author_registry}"
   container_name         = "eq-publisher"
   container_port         = 9000
@@ -453,6 +504,72 @@ module "publisher" {
   EOF
 }
 
+module "survey-register" {
+  source                 = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.1"
+  env                    = "${var.env}"
+  aws_account_id         = "${var.aws_account_id}"
+  aws_assume_role_arn    = "${var.aws_assume_role_arn}"
+  dns_zone_name          = "${var.dns_zone_name}"
+  ecs_cluster_name       = "${module.author-eq-ecs.ecs_cluster_name}"
+  vpc_id                 = "${module.author-vpc.vpc_id}"
+  aws_alb_arn            = "${module.author-eq-ecs.aws_external_alb_arn}"
+  aws_alb_listener_arn   = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
+  service_name           = "survey-register"
+  listener_rule_priority = 600
+  docker_registry        = "${var.author_registry}"
+  container_name         = "eq-survey-register"
+  container_port         = 8080
+  container_tag          = "${var.author_tag}"
+  healthcheck_path       = "/status"
+  application_min_tasks  = "${var.survey_register_min_tasks}"
+  slack_alert_sns_arn    = "${module.eq-alerting.slack_alert_sns_arn}"
+  ecs_subnet_ids         = "${module.author-eq-ecs.ecs_subnet_ids}"
+  ecs_alb_security_group = ["${module.author-eq-ecs.ecs_alb_security_group}"]
+  launch_type            = "FARGATE"
+
+  container_environment_variables = <<EOF
+      {
+        "name": "DYNAMO_SURVEY_REGISTRY_TABLE_NAME",
+        "value": "${module.author-dynamodb.survey_registry_table_name}"
+      },
+      {
+        "name": "SURVEY_REGISTER_URL",
+        "value": "${module.survey-register.service_address}"
+      },
+      {
+        "name": "GO_QUICK_LAUNCHER_URL",
+        "value": "${module.author-survey-launcher.service_address}/quick-launch?url="
+      },
+      {
+        "name": "PUBLISHER_URL",
+        "value": "${module.publisher.service_address}/publish/"
+      }
+  EOF
+
+  task_has_iam_policy = true
+
+  task_iam_policy_json = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+      {
+          "Sid": "",
+          "Effect": "Allow",
+          "Action": [
+              "dynamodb:Scan",
+              "dynamodb:DescribeTable",
+              "dynamodb:PutItem",
+              "dynamodb:UpdateItem",
+              "dynamodb:GetItem",
+              "dynamodb:Query"
+          ],
+          "Resource": "${module.author-dynamodb.survey_registry_table_arn}"
+      }
+  ]
+}
+  EOF
+}
+
 module "author-schema-validator" {
   source                 = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.1"
   env                    = "${var.env}"
@@ -464,7 +581,7 @@ module "author-schema-validator" {
   aws_alb_arn            = "${module.author-eq-ecs.aws_external_alb_arn}"
   aws_alb_listener_arn   = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
   service_name           = "author-schema-validator"
-  listener_rule_priority = 600
+  listener_rule_priority = 500
   docker_registry        = "${var.schema_validator_registry}"
   container_name         = "eq-schema-validator"
   container_port         = 5000
@@ -510,7 +627,7 @@ module "author-survey-runner-dynamodb" {
 }
 
 module "author-dynamodb" {
-  source              = "github.com/ONSdigital/eq-author-terraform-dynamodb?ref=v0.2"
+  source              = "github.com/ONSdigital/eq-author-terraform-dynamodb?ref=v0.3"
   env                 = "${var.env}-author"
   aws_account_id      = "${var.aws_account_id}"
   aws_assume_role_arn = "${var.aws_assume_role_arn}"
