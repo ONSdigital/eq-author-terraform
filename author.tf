@@ -514,12 +514,12 @@ module "survey-register" {
   vpc_id                 = "${module.author-vpc.vpc_id}"
   aws_alb_arn            = "${module.author-eq-ecs.aws_external_alb_arn}"
   aws_alb_listener_arn   = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
-  service_name           = "survey-register"
+  service_name           = "author-survey-register"
   listener_rule_priority = 600
   docker_registry        = "${var.author_registry}"
   container_name         = "eq-survey-register"
   container_port         = 8080
-  container_tag          = "${var.author_tag}"
+  container_tag          = "${var.register_tag}"
   healthcheck_path       = "/status"
   application_min_tasks  = "${var.survey_register_min_tasks}"
   slack_alert_sns_arn    = "${module.eq-alerting.slack_alert_sns_arn}"
