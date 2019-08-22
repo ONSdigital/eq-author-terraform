@@ -208,6 +208,11 @@ variable "survey_launcher_jwt_signing_key_path" {
   default     = "jwt-test-keys/sdc-user-authentication-signing-launcher-private-key.pem"
 }
 
+variable "register_tag" {
+  description = "The tag for the Survey Register image to run"
+  default     = "latest"
+}
+
 variable "survey_register_min_tasks" {
   description = "The minimum number of Survey Register tasks to run"
   default     = "1"
