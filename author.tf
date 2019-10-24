@@ -436,7 +436,8 @@ module "author-api" {
               "dynamodb:PutItem",
               "dynamodb:UpdateItem",
               "dynamodb:GetItem",
-              "dynamodb:DeleteItem"
+              "dynamodb:DeleteItem",
+              "dynamodb:Query"
           ],
           "Resource": "${module.author-dynamodb.author_questionnaires_table_arn}"
       },
