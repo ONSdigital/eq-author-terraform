@@ -400,6 +400,10 @@ module "author-api" {
         "value": "${module.author-dynamodb.author_questionnaire_versions_table_name}"
       },
       {
+        "name": "DYNAMO_COMMENTS_TABLE_NAME",
+        "value": "${module.author-dynamodb.author_comments_table_name}"
+      },
+      {
         "name": "ENABLE_IMPORT",
         "value": "${var.author_api_enable_import}"
       },
@@ -464,6 +468,20 @@ module "author-api" {
               "dynamodb:Query"
           ],
           "Resource": "${module.author-dynamodb.author_users_table_arn}"
+      },
+      {
+          "Sid": "",
+          "Effect": "Allow",
+          "Action": [
+              "dynamodb:Scan",
+              "dynamodb:DescribeTable",
+              "dynamodb:PutItem",
+              "dynamodb:UpdateItem",
+              "dynamodb:GetItem",
+              "dynamodb:DeleteItem",
+              "dynamodb:Query"
+          ],
+          "Resource": "${module.author-dynamodb.author_comments_table_arn}"
       }
   ]
 }
@@ -628,7 +646,7 @@ module "author-survey-runner-dynamodb" {
 }
 
 module "author-dynamodb" {
-  source              = "github.com/ONSdigital/eq-author-terraform-dynamodb?ref=v0.3"
+  source              = "github.com/ONSdigital/eq-author-terraform-dynamodb?ref=v0.4"
   env                 = "${var.env}-author"
   aws_account_id      = "${var.aws_account_id}"
   aws_assume_role_arn = "${var.aws_assume_role_arn}"
