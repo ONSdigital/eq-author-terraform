@@ -646,7 +646,7 @@ module "author-survey-runner-dynamodb" {
 }
 
 module "author-dynamodb" {
-  source              = "github.com/ONSdigital/eq-author-terraform-dynamodb?ref=v0.4"
+  source              = "github.com/ONSdigital/eq-author-terraform-dynamodb?ref=v0.5"
   env                 = "${var.env}-author"
   aws_account_id      = "${var.aws_account_id}"
   aws_assume_role_arn = "${var.aws_assume_role_arn}"
