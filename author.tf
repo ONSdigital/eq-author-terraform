@@ -232,27 +232,27 @@ module "author-survey-runner-static" {
 }
 
 module "author-survey-launcher" {
-  source                   = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.1"
-  env                      = "${var.env}"
-  aws_account_id           = "${var.aws_account_id}"
-  aws_assume_role_arn      = "${var.aws_assume_role_arn}"
-  vpc_id                   = "${module.author-vpc.vpc_id}"
-  dns_zone_name            = "${var.dns_zone_name}"
-  ecs_cluster_name         = "${module.author-eq-ecs.ecs_cluster_name}"
-  aws_alb_arn              = "${module.author-eq-ecs.aws_external_alb_arn}"
-  aws_alb_listener_arn     = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
-  service_name             = "author-launch"
-  listener_rule_priority   = 700
-  docker_registry          = "${var.author_registry}"
-  container_name           = "go-launch-a-survey"
-  container_port           = 8000
-  healthcheck_path         = "/status"
-  container_tag            = "${var.survey_launcher_tag}"
-  application_min_tasks    = "${var.survey_launcher_min_tasks}"
-  ecs_subnet_ids           = "${module.author-eq-ecs.ecs_subnet_ids}"
-  ecs_alb_security_group   = ["${module.author-eq-ecs.ecs_alb_security_group}"]
-  launch_type              = "FARGATE"
-  slack_alert_sns_arn      = "${module.eq-alerting.slack_alert_sns_arn}"
+  source                 = "github.com/ONSdigital/eq-ecs-deploy?ref=v4.1"
+  env                    = "${var.env}"
+  aws_account_id         = "${var.aws_account_id}"
+  aws_assume_role_arn    = "${var.aws_assume_role_arn}"
+  vpc_id                 = "${module.author-vpc.vpc_id}"
+  dns_zone_name          = "${var.dns_zone_name}"
+  ecs_cluster_name       = "${module.author-eq-ecs.ecs_cluster_name}"
+  aws_alb_arn            = "${module.author-eq-ecs.aws_external_alb_arn}"
+  aws_alb_listener_arn   = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
+  service_name           = "author-launch"
+  listener_rule_priority = 700
+  docker_registry        = "${var.author_registry}"
+  container_name         = "go-launch-a-survey"
+  container_port         = 8000
+  healthcheck_path       = "/status"
+  container_tag          = "${var.survey_launcher_tag}"
+  application_min_tasks  = "${var.survey_launcher_min_tasks}"
+  ecs_subnet_ids         = "${module.author-eq-ecs.ecs_subnet_ids}"
+  ecs_alb_security_group = ["${module.author-eq-ecs.ecs_alb_security_group}"]
+  launch_type            = "FARGATE"
+  slack_alert_sns_arn    = "${module.eq-alerting.slack_alert_sns_arn}"
 
   container_environment_variables = <<EOF
       {
@@ -274,6 +274,10 @@ module "author-survey-launcher" {
       {
         "name": "SECRETS_S3_BUCKET",
         "value": "${var.survey_launcher_s3_secrets_bucket}"
+      },
+      {
+        "name": "SURVEY_REGISTER_URL",
+        "value": "${module.survey-register.service_address}"
       }
   EOF
 }
@@ -582,7 +586,7 @@ module "survey-register" {
               "dynamodb:GetItem",
               "dynamodb:Query"
           ],
-          "Resource": "${module.author-dynamodb.survey_registry_table_arn}"
+          "Resource": ["${module.author-dynamodb.survey_registry_table_arn}", "${module.author-dynamodb.survey_registry_table_arn}/index/sortKey"]
       }
   ]
 }
@@ -646,7 +650,7 @@ module "author-survey-runner-dynamodb" {
 }
 
 module "author-dynamodb" {
-  source              = "github.com/ONSdigital/eq-author-terraform-dynamodb?ref=v0.5"
+  source              = "github.com/ONSdigital/eq-author-terraform-dynamodb?ref=v0.6"
   env                 = "${var.env}-author"
   aws_account_id      = "${var.aws_account_id}"
   aws_assume_role_arn = "${var.aws_assume_role_arn}"
