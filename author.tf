@@ -427,6 +427,10 @@ module "author-api" {
         "name": "REDIS_PORT",
         "value": "${module.author-redis.author_redis_port}"
       }
+      {
+        "name": "ALLOWED_EMAIL_LIST",
+        "value": "${var.author_api_allowed_email_list}"
+      }
   EOF
 
   task_has_iam_policy = true
