@@ -188,6 +188,11 @@ variable "author_api_min_tasks" {
   default     = "1"
 }
 
+variable "author_api_allowed_email_list" {
+  description = "The minimum number of Author API tasks to run"
+  default     = "@ons.gov.uk, @ext.ons.gov.uk, @nisra.gov.uk"
+}
+
 variable "publisher_min_tasks" {
   description = "The minimum number of Publisher tasks to run"
   default     = "1"
