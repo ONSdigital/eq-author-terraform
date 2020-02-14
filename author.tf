@@ -35,7 +35,7 @@ module "eq-alerting" {
   aws_account_id      = "${var.aws_account_id}"
   aws_assume_role_arn = "${var.aws_assume_role_arn}"
   slack_webhook_path  = "${var.slack_webhook_path}"
-  slack_channel       = "eq-${var.env}-alerts"
+  slack_channel       = "author-${var.env}-alerts"
 }
 
 module "author-eq-ecs" {
