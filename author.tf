@@ -380,10 +380,6 @@ module "author-api" {
 
   container_environment_variables = <<EOF
       {
-        "name": "DB_CONNECTION_URI",
-        "value": "postgres://${var.author_database_user}:${var.author_database_password}@${module.author-database.database_address}:${module.author-database.database_port}/${var.author_database_name}"
-      },
-      {
         "name": "RUNNER_SESSION_URL",
         "value": "${module.author-survey-runner.service_address}/session?token="
       },
