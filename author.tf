@@ -642,7 +642,6 @@ module "author-database" {
   db_subnet_group_name             = "${module.author-vpc.database_subnet_group_name}"
   database_identifier              = "${var.env}-authorrds"
   rds_security_group_name          = "${var.env}-author-rds-access"
-  snapshot_identifier              = "pre-migrate-author"
 }
 
 module "author-survey-runner-dynamodb" {
