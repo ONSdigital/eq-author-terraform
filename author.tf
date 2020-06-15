@@ -623,27 +623,6 @@ module "author-schema-validator" {
   memory_units           = "512"
 }
 
-module "author-database" {
-  source                           = "github.com/ONSdigital/eq-terraform/survey-runner-database"
-  env                              = "${var.env}"
-  aws_account_id                   = "${var.aws_account_id}"
-  aws_assume_role_arn              = "${var.aws_assume_role_arn}"
-  vpc_id                           = "${module.author-vpc.vpc_id}"
-  application_cidrs                = "${var.author_application_cidrs}"
-  multi_az                         = "${var.multi_az}"
-  backup_retention_period          = "${var.backup_retention_period}"
-  database_apply_immediately       = "${var.database_apply_immediately}"
-  database_instance_class          = "${var.database_instance_class}"
-  database_allocated_storage       = "${var.database_allocated_storage}"
-  database_free_memory_alert_level = "${var.database_free_memory_alert_level}"
-  database_name                    = "${var.author_database_name}"
-  database_user                    = "${var.author_database_user}"
-  database_password                = "${var.author_database_password}"
-  db_subnet_group_name             = "${module.author-vpc.database_subnet_group_name}"
-  database_identifier              = "${var.env}-authorrds"
-  rds_security_group_name          = "${var.env}-author-rds-access"
-}
-
 module "author-survey-runner-dynamodb" {
   source              = "github.com/ONSdigital/eq-terraform-dynamodb?ref=v2.2"
   env                 = "${var.env}-author"
