@@ -112,6 +112,24 @@ variable "backup_retention_period" {
 }
 
 // Author
+variable "author_database" {
+  description = "which database to use (dynamodb, mongodb, firestore)"
+  default     = "dynamodb"
+}
+
+variable "author_mongo_username" {
+  description = "username for mongodb"
+}
+
+variable "author_mongo_password" {
+  description = "password for mongodb"
+}
+
+variable "author_mongo_databasename" {
+  description = "database name for mongodb"
+  default = "author"
+}
+
 variable "author_vpc_cidr_block" {
   description = "VPC CIDR block"
   default     = "10.0.0.0/16"
