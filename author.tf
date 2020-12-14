@@ -8,14 +8,14 @@ terraform {
 }
 
 module "author-vpc" {
-  source                     = "github.com/ONSdigital/eq-terraform?ref=23.0.0/survey-runner-vpc"
-  env                        = "${var.env}"
-  aws_account_id             = "${var.aws_account_id}"
-  aws_assume_role_arn        = "${var.aws_assume_role_arn}"
-  vpc_name                   = "author"
-  vpc_cidr_block             = "${var.author_vpc_cidr_block}"
-  database_cidrs             = "${var.author_database_cidrs}"
-  db_subnet_group_identifier = "author-"
+  source                           = "github.com/ONSdigital/eq-terraform/survey-runner-vpc-database"
+  env                              = "${var.env}"
+  aws_account_id                   = "${var.aws_account_id}"
+  aws_assume_role_arn              = "${var.aws_assume_role_arn}"
+  vpc_name                         = "author"
+  vpc_cidr_block                   = "${var.author_vpc_cidr_block}"
+  database_cidrs                   = "${var.author_database_cidrs}"
+  database_subnet_group_identifier = "author-"
 }
 
 module "author-routing" {
@@ -426,6 +426,14 @@ module "author-api" {
       {
         "name": "ALLOWED_EMAIL_LIST",
         "value": "${var.author_api_allowed_email_list}"
+      },
+      {
+        "name": "DATABASE",
+        "value": "${var.author_database}"
+      },
+      {
+        "name": "MONGO_URL",
+        "value": "mongodb://${var.author_mongo_username}:${var.author_mongo_password}@${module.author-documentdb.documentdb_cluster_endpoint}:27017/${var.author_mongo_databasename}?replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
       }
   EOF
 
@@ -633,6 +641,20 @@ module "author-dynamodb" {
   aws_account_id      = "${var.aws_account_id}"
   aws_assume_role_arn = "${var.aws_assume_role_arn}"
   slack_alert_sns_arn = "${module.eq-alerting.slack_alert_sns_arn}"
+}
+
+module "author-documentdb" {
+  source                          = "github.com/ONSdigital/eq-terraform/aws-documentdb"
+  env                             = "${var.env}"
+  aws_account_id                  = "${var.aws_account_id}"
+  aws_assume_role_arn             = "${var.aws_assume_role_arn}"
+  vpc_id                          = "${module.author-vpc.vpc_id}"
+  documentdb_security_group_name  = "${var.env}-author-documentdb-security-group"
+  documentdb_cluster_name         = "author-documentdb"
+  documentdb_subnet_group_name    = "${module.author-vpc.database_subnet_group_name}"
+  application_cidrs               = "${var.author_application_cidrs}"
+  master_username                 = "${var.author_mongo_username}"
+  master_password                 = "${var.author_mongo_password}"
 }
 
 module "author-redis" {
