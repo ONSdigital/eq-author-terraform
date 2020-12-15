@@ -8,7 +8,7 @@ terraform {
 }
 
 module "author-vpc" {
-  source                           = "github.com/ONSdigital/eq-terraform/survey-runner-vpc-database"
+  source                           = "./aws-vpc"
   env                              = "${var.env}"
   aws_account_id                   = "${var.aws_account_id}"
   aws_assume_role_arn              = "${var.aws_assume_role_arn}"
@@ -19,7 +19,7 @@ module "author-vpc" {
 }
 
 module "author-routing" {
-  source              = "github.com/ONSdigital/eq-terraform/survey-runner-routing"
+  source              = "./aws-routing"
   env                 = "${var.env}"
   aws_account_id      = "${var.aws_account_id}"
   aws_assume_role_arn = "${var.aws_assume_role_arn}"
@@ -30,7 +30,7 @@ module "author-routing" {
 }
 
 module "eq-alerting" {
-  source              = "github.com/ONSdigital/eq-terraform/survey-runner-alerting"
+  source              = "./aws-alerting"
   env                 = "${var.env}-author"
   aws_account_id      = "${var.aws_account_id}"
   aws_assume_role_arn = "${var.aws_assume_role_arn}"
@@ -392,24 +392,8 @@ module "author-api" {
         "value": "${module.survey-register.service_address}/submit/"
       },
       {
-        "name": "DYNAMO_QUESTIONNAIRE_TABLE_NAME",
-        "value": "${module.author-dynamodb.author_questionnaires_table_name}"
-      },
-      {
-        "name": "DYNAMO_QUESTIONNAIRE_VERSION_TABLE_NAME",
-        "value": "${module.author-dynamodb.author_questionnaire_versions_table_name}"
-      },
-      {
-        "name": "DYNAMO_COMMENTS_TABLE_NAME",
-        "value": "${module.author-dynamodb.author_comments_table_name}"
-      },
-      {
         "name": "ENABLE_IMPORT",
         "value": "${var.author_api_enable_import}"
-      },
-      {
-        "name": "DYNAMO_USER_TABLE_NAME",
-        "value": "${module.author-dynamodb.author_users_table_name}"
       },
       {
         "name": "FIREBASE_PROJECT_ID",
@@ -437,67 +421,7 @@ module "author-api" {
       }
   EOF
 
-  task_has_iam_policy = true
-
-  task_iam_policy_json = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-      {
-          "Sid": "",
-          "Effect": "Allow",
-          "Action": [
-              "dynamodb:Scan",
-              "dynamodb:DescribeTable",
-              "dynamodb:PutItem",
-              "dynamodb:UpdateItem",
-              "dynamodb:GetItem",
-              "dynamodb:DeleteItem",
-              "dynamodb:Query"
-          ],
-          "Resource": "${module.author-dynamodb.author_questionnaires_table_arn}"
-      },
-      {
-          "Sid": "",
-          "Effect": "Allow",
-          "Action": [
-              "dynamodb:DescribeTable",
-              "dynamodb:PutItem",
-              "dynamodb:GetItem",
-              "dynamodb:Query"
-          ],
-          "Resource": "${module.author-dynamodb.author_questionnaire_versions_table_arn}"
-      },
-      {
-          "Sid": "",
-          "Effect": "Allow",
-          "Action": [
-              "dynamodb:Scan",
-              "dynamodb:DescribeTable",
-              "dynamodb:PutItem",
-              "dynamodb:UpdateItem",
-              "dynamodb:GetItem",
-              "dynamodb:Query"
-          ],
-          "Resource": "${module.author-dynamodb.author_users_table_arn}"
-      },
-      {
-          "Sid": "",
-          "Effect": "Allow",
-          "Action": [
-              "dynamodb:Scan",
-              "dynamodb:DescribeTable",
-              "dynamodb:PutItem",
-              "dynamodb:UpdateItem",
-              "dynamodb:GetItem",
-              "dynamodb:DeleteItem",
-              "dynamodb:Query"
-          ],
-          "Resource": "${module.author-dynamodb.author_comments_table_arn}"
-      }
-  ]
-}
-  EOF
+  task_has_iam_policy = false
 }
 
 module "publisher" {
@@ -636,7 +560,7 @@ module "author-survey-runner-dynamodb" {
 }
 
 module "author-dynamodb" {
-  source              = "github.com/ONSdigital/eq-author-terraform-dynamodb?ref=v0.6"
+  source              = "./aws-dynamodb"
   env                 = "${var.env}-author"
   aws_account_id      = "${var.aws_account_id}"
   aws_assume_role_arn = "${var.aws_assume_role_arn}"
@@ -644,7 +568,7 @@ module "author-dynamodb" {
 }
 
 module "author-documentdb" {
-  source                          = "github.com/ONSdigital/eq-terraform/aws-documentdb"
+  source                          = "./aws-documentdb"
   env                             = "${var.env}"
   aws_account_id                  = "${var.aws_account_id}"
   aws_assume_role_arn             = "${var.aws_assume_role_arn}"
@@ -658,7 +582,7 @@ module "author-documentdb" {
 }
 
 module "author-redis" {
-  source              = "github.com/ONSdigital/eq-author-terraform-redis?ref=v1.0"
+  source              = "./aws-redis"
   env                 = "${var.env}-author"
   aws_account_id      = "${var.aws_account_id}"
   aws_assume_role_arn = "${var.aws_assume_role_arn}"
@@ -668,7 +592,7 @@ module "author-redis" {
 }
 
 module "author-waf" {
-  source              = "github.com/ONSdigital/eq-author-terraform-waf?ref=v1.1"
+  source              = "./aws-waf"
   env                 = "${var.env}-author"
   aws_account_id      = "${var.aws_account_id}"
   aws_assume_role_arn = "${var.aws_assume_role_arn}"
