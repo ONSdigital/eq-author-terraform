@@ -1,11 +1,22 @@
 resource "aws_dynamodb_table" "survey_registry_table" {
-  name           = "${var.env}-survey-registry"
-  hash_key       = "id"
-  billing_mode   = "PAY_PER_REQUEST"
+  name         = "${var.env}-survey-registry"
+  hash_key     = "registry_id"
+  billing_mode = "PAY_PER_REQUEST"
 
   attribute {
-    name = "id"
+    name = "registry_id"
     type = "S"
+  }
+
+  attribute {
+    name = "sort_key"
+    type = "S"
+  }
+
+  global_secondary_index {
+    name            = "sortKey"
+    hash_key        = "sort_key"
+    projection_type = "ALL"
   }
 
   tags {
