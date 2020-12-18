@@ -392,6 +392,22 @@ module "author-api" {
         "value": "${module.survey-register.service_address}/submit/"
       },
       {
+        "name": "DYNAMO_QUESTIONNAIRE_TABLE_NAME",
+        "value": "${module.author-dynamodb.author_questionnaires_table_name}"
+      },
+      {
+        "name": "DYNAMO_QUESTIONNAIRE_VERSION_TABLE_NAME",
+        "value": "${module.author-dynamodb.author_questionnaire_versions_table_name}"
+      },
+      {
+        "name": "DYNAMO_COMMENTS_TABLE_NAME",
+        "value": "${module.author-dynamodb.author_comments_table_name}"
+      },
+      {
+        "name": "DYNAMO_USER_TABLE_NAME",
+        "value": "${module.author-dynamodb.author_users_table_name}"
+      },
+      {
         "name": "ENABLE_IMPORT",
         "value": "${var.author_api_enable_import}"
       },
