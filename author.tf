@@ -243,7 +243,7 @@ module "author-survey-launcher" {
   aws_alb_listener_arn   = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
   service_name           = "author-launch"
   listener_rule_priority = 700
-  docker_registry        = "${var.author_registry}"
+  docker_registry        = "${var.survey_runner_docker_registry}"
   container_name         = "go-launch-a-survey"
   container_port         = 8000
   healthcheck_path       = "/status"
