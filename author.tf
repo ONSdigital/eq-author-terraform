@@ -487,7 +487,7 @@ module "survey-register" {
   aws_alb_listener_arn   = "${module.author-eq-ecs.aws_external_alb_listener_arn}"
   service_name           = "author-survey-register"
   listener_rule_priority = 600
-  docker_registry        = "${var.author_registry}"
+  docker_registry        = "${var.survey_register_registry}"
   container_name         = "eq-survey-register"
   container_port         = 8080
   container_tag          = "${var.register_tag}"
