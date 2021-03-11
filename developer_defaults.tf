@@ -277,3 +277,9 @@ variable "create_ecs_internal_elb" {
   description = "Deploy an internal load balancer for ECS"
   default     = false
 }
+
+//survey register
+variable "survey_register_registry" {
+  description = "The docker repository for the survey register images to run"
+  default     = "onsdigital"
+}
