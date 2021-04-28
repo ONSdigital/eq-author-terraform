@@ -114,15 +114,17 @@ variable "backup_retention_period" {
 // Author
 variable "author_database" {
   description = "which database to use (dynamodb, mongodb, firestore)"
-  default     = "dynamodb"
+  default     = "mongodb"
 }
 
 variable "author_mongo_username" {
   description = "username for mongodb"
+  default     = "author"
 }
 
 variable "author_mongo_password" {
   description = "password for mongodb"
+  default = "digitaleq"
 }
 
 variable "author_mongo_databasename" {
