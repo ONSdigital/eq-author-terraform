@@ -1,5 +1,5 @@
 provider "aws" {
-  version             = ">= 1.9.0"
+  version = "~> 2.7"
   allowed_account_ids = ["${var.aws_account_id}"]
 
   assume_role {
